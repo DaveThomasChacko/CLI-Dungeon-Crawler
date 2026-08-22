@@ -63,15 +63,19 @@ int main(){
 }
 void EnemySpawn(int id, Player& ply_ob){
     if (id <= 40){
-        cout << "A Goblin Approaches with a Crackling Laugh!\n";
-        Enemy goblin("Goblin", 10+(2*ply_ob.score), 2+(2*ply_ob.score), 1);
+        cout << "A Goblin Appears with a Crackling Laugh!\n";
+        Enemy goblin("Goblin", 10+(2*ply_ob.score), 5+(2*ply_ob.score), 1);
         Battle(ply_ob, goblin);
     }
     else if (id <= 60){
-        cout << "Zombie spawn\n";
+        cout << "A Zombie Marches towards you with a Ghastly Moan!\n";
+        Enemy zombie("Zombie", 20+(2*ply_ob.score), 7+(2*ply_ob.score), 2);
+        Battle(ply_ob, zombie);
     }     
     else{
-        cout << "Mummy spawn\n";
+        cout << "A Mummy Approaches from the Shadows!";
+        Enemy mummy("Mummy", 12+(2*ply_ob.score), 10+(2*ply_ob.score), 3);
+        Battle(ply_ob, mummy);
     } 
 }
 void Battle(Player& player_object, Enemy& enem_ob){
@@ -91,8 +95,8 @@ void Battle(Player& player_object, Enemy& enem_ob){
                 cout << "You have attacked " << enem_ob.name << " for " << player_object.attack << " damage!" << endl;
                 if(enem_ob.health == 0){
                     player_object.score += enem_ob.score_worth;
-                    cout << enem_ob.name << " has fallen\n"
-                         << "You have been awarded " << enem_ob.score_worth << " score" << endl;
+                    cout << enem_ob.name << " has fallen!\n"
+                         << "You have been awarded " << enem_ob.score_worth << " score!" << endl;
                     is_fighting=false;
                     break;
                 }
@@ -102,8 +106,15 @@ void Battle(Player& player_object, Enemy& enem_ob){
             case 2:
                 break;
             case 3:
+                cout << "Player Stats: \n"
+                 << "Health : " << player_object.health << "\n"
+                 << "Attack Power : " << player_object.attack << "\n"
+                 << "Score : " << player_object.score << "\n";
                 break;
             case 4:
+                cout << enem_ob.name <<"'s Stats: \n"
+                 << "Health : " << enem_ob.health << "\n"
+                 << "Attack Power : " << enem_ob.attack << "\n";
                 break;
         }
     }
@@ -113,7 +124,6 @@ void GenerateRoom(Player& player_ob){
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> dist(1, 100);//Random number from 1-100 which decides our room
     int room_id = dist(gen);
-    cout << room_id << "\n";
     if (room_id <= 70) { 
         cout << "Enemy Spotted \n"; // 70% chance of an enemy room
         EnemySpawn(room_id, player_ob);
