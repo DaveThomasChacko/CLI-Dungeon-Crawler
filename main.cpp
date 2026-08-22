@@ -6,9 +6,11 @@ using namespace std;
 
 class Player{
     public:
-        int health =100;
+        int health = 50;
         int attack = 10;
         int score = 0;
+        int no_of_attackpotion = 0;
+        int no_of_healthpotion = 0;
 
 };
 class Enemy{
@@ -51,7 +53,9 @@ int main(){
                  << "Score : " << player.score << "\n";
                 break;
             case 3:
-                cout << "Potion Bag Shown!\n";
+                cout << "Potion Bag : !\n"
+                     << "\t Health Potions : " << player.no_of_healthpotion << "\n"
+                     << "\t Attack Potions : " << player.no_of_attackpotion << "\n";
                 break;
             case 4:
                 notQuit = false;
@@ -73,7 +77,7 @@ void EnemySpawn(int id, Player& ply_ob){
         Battle(ply_ob, zombie);
     }     
     else{
-        cout << "A Mummy Approaches from the Shadows!";
+        cout << "A Mummy Approaches from the Shadows!\n";
         Enemy mummy("Mummy", 12+(2*ply_ob.score), 10+(2*ply_ob.score), 3);
         Battle(ply_ob, mummy);
     } 
@@ -91,17 +95,23 @@ void Battle(Player& player_object, Enemy& enem_ob){
         cin >> battle_choice;
         switch(battle_choice){
             case 1:
-                enem_ob.health -= player_object.attack;  //Player deals damage to Enemy
+                enem_ob.health -= player_object.attack;  // Player deals damage to Enemy
                 cout << "You have attacked " << enem_ob.name << " for " << player_object.attack << " damage!" << endl;
-                if(enem_ob.health == 0){
+                if(enem_ob.health <= 0){
                     player_object.score += enem_ob.score_worth;
                     cout << enem_ob.name << " has fallen!\n"
                          << "You have been awarded " << enem_ob.score_worth << " score!" << endl;
                     is_fighting=false;
                     break;
                 }
-                player_object.health -= enem_ob.attack; //Enemy deals damage to Player
+                player_object.health -= enem_ob.attack; // Enemy deals damage to Player
                 cout << "The " << enem_ob.name << " attacks you for " << enem_ob.attack << "!" << endl;
+                if(player_object.health <= 0){
+                    cout <<"+++===========================+++\n"
+                         << "You Died to a " << enem_ob.name <<"\n"
+                         <<"+++===========================+++\n";
+                    is_fighting =false;
+                }
                 break;
             case 2:
                 break;
@@ -116,9 +126,14 @@ void Battle(Player& player_object, Enemy& enem_ob){
                  << "Health : " << enem_ob.health << "\n"
                  << "Attack Power : " << enem_ob.attack << "\n";
                 break;
+            case 5:
+                cout << "You have fled from a " << enem_ob.name << endl;
+                is_fighting =false;
+                break;
         }
     }
 }
+
 void GenerateRoom(Player& player_ob){
     std::random_device rd;
     std::mt19937 gen(rd());
