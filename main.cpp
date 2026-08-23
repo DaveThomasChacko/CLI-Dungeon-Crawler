@@ -4,7 +4,7 @@ using namespace std;
 //Function Prototypes
 
 
-class Player{
+class Player{ // Player Class and Stats
     public:
         int health = 50;
         int attack = 10;
@@ -13,21 +13,26 @@ class Player{
         int no_of_healthpotion = 0;
 
 };
-class Enemy{
+class Enemy{ //Enemy Class and Stats 
     public:
     string name;
     int health;
     int attack;
     int score_worth;
     Enemy(string name, int health, int attack, int score_worth)
-        : name(name), health(health), attack(attack), score_worth(score_worth){}
+        : name(name), health(health), attack(attack), score_worth(score_worth){
+            cout << name <<" : \n"
+                 << "Health : " << health << "\n"
+                 << "Attack : " << attack << endl;
+
+        }
         
 };
-void GenerateRoom(Player& player_ob);
-void EnemySpawn(int id, Player& ply_ob);
-void Battle(Player& player_object, Enemy& enem_ob);
+void GenerateRoom(Player& player_ob); //Randomly chooses the next room on exploring
+void EnemySpawn(int id, Player& ply_ob); //Creates Enemy Object
+void Battle(Player& player_object, Enemy& enem_ob); //Controls Fight Sequences
 
-int main(){
+int main(){ 
     Player player;
     int choice;
     bool notQuit = true;
@@ -53,9 +58,39 @@ int main(){
                  << "Score : " << player.score << "\n";
                 break;
             case 3:
-                cout << "Potion Bag : !\n"
+                int potionchoice;
+                cout << "Potion Bag :\n"
                      << "\t Health Potions : " << player.no_of_healthpotion << "\n"
-                     << "\t Attack Potions : " << player.no_of_attackpotion << "\n";
+                     << "\t Attack Potions : " << player.no_of_attackpotion << "\n \n"
+                     << "Use Potion?\n"
+                     << "1. Use Health Potion\n"
+                     << "2. Use Attack Potion\n"
+                     << "3. Close Potion Bag" << endl;
+                cin >> potionchoice;
+                switch (potionchoice){
+                    case 1:
+                        if(player.no_of_healthpotion > 0){
+                            player.no_of_healthpotion -=1;
+                            player.health += 30;
+                            cout << "Your Health has increased by 30!" << endl;
+                            
+                        }
+                        break;
+                    case 2:
+                        if(player.no_of_attackpotion > 0){
+                            player.no_of_attackpotion -=1;
+                            player.attack += 10;
+                            cout << "Your Attack Power has increased by 10!" << endl;
+                            
+                        }
+                        break;
+                    case 3:
+                        cout << "You close your Potion Bag." << endl;
+                        break;
+                    default:
+                        cout << "Invalid Input!" << endl;
+                        break;
+                }
                 break;
             case 4:
                 notQuit = false;
@@ -68,17 +103,17 @@ int main(){
 void EnemySpawn(int id, Player& ply_ob){
     if (id <= 40){
         cout << "A Goblin Appears with a Crackling Laugh!\n";
-        Enemy goblin("Goblin", 10+(2*ply_ob.score), 5+(2*ply_ob.score), 1);
+        Enemy goblin("Goblin", 10 + (4 * (ply_ob.score/5)), 2 + (2 * (ply_ob.score/5)), 1);
         Battle(ply_ob, goblin);
     }
     else if (id <= 60){
         cout << "A Zombie Marches towards you with a Ghastly Moan!\n";
-        Enemy zombie("Zombie", 20+(2*ply_ob.score), 7+(2*ply_ob.score), 2);
+        Enemy zombie("Zombie", 25+(2*(ply_ob.score/5)), 7+(2*(ply_ob.score/5)), 2);
         Battle(ply_ob, zombie);
     }     
     else{
         cout << "A Mummy Approaches from the Shadows!\n";
-        Enemy mummy("Mummy", 12+(2*ply_ob.score), 10+(2*ply_ob.score), 3);
+        Enemy mummy("Mummy", 15+(2*(ply_ob.score/5)), 10+(2*(ply_ob.score/5)), 3);
         Battle(ply_ob, mummy);
     } 
 }
@@ -87,11 +122,10 @@ void Battle(Player& player_object, Enemy& enem_ob){
     int battle_choice;
     while(is_fighting){
         cout << "---FIGHT MENU---\n" 
-        << "1. Attack\n" 
-        << "2. Open Potion Bag\n" 
-        << "3. Player Stats\n" 
-        << "4. Enemy Stats\n"
-        << "5. Flee" << endl;
+        << "1. Attack\n"  
+        << "2. Player Stats\n" 
+        << "3. Enemy Stats\n"
+        << "4. Flee" << endl;
         cin >> battle_choice;
         switch(battle_choice){
             case 1:
@@ -114,20 +148,19 @@ void Battle(Player& player_object, Enemy& enem_ob){
                 }
                 break;
             case 2:
-                break;
-            case 3:
                 cout << "Player Stats: \n"
                  << "Health : " << player_object.health << "\n"
                  << "Attack Power : " << player_object.attack << "\n"
                  << "Score : " << player_object.score << "\n";
                 break;
-            case 4:
+            case 3:
                 cout << enem_ob.name <<"'s Stats: \n"
                  << "Health : " << enem_ob.health << "\n"
                  << "Attack Power : " << enem_ob.attack << "\n";
                 break;
-            case 5:
+            case 4:
                 cout << "You have fled from a " << enem_ob.name << endl;
+                player_object.score -= 1;
                 is_fighting =false;
                 break;
         }
@@ -139,12 +172,17 @@ void GenerateRoom(Player& player_ob){
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> dist(1, 100);//Random number from 1-100 which decides our room
     int room_id = dist(gen);
-    if (room_id <= 70) { 
-        cout << "Enemy Spotted \n"; // 70% chance of an enemy room
+    if (room_id <= 60) { 
+        cout << "Enemy Spotted \n"; // 60% chance of an enemy room
         EnemySpawn(room_id, player_ob);
     }
+    else if (room_id <= 80) {  
+        cout << "You find a Health Potion \n"; // 20% chance of getting a Health potion
+        player_ob.no_of_healthpotion +=1;
+    }
     else if (room_id <= 90) {  
-        cout << "Potion Get \n"; // 20% chance of getting a potion
+        cout << "You find a Attack Potion \n"; // 10% chance of getting a Attack potion
+        player_ob.no_of_attackpotion +=1;
     }   
     else {
         cout << "Empty Room \n"; // 10% chance of a empty room
