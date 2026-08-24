@@ -1,5 +1,6 @@
 #include <iostream>
 #include <random>
+#include <fstream>
 using namespace std; 
 
 class Player{ // Player Class and Stats
@@ -11,7 +12,7 @@ class Player{ // Player Class and Stats
         int no_of_healthpotion = 0;
 
 };
-class Enemy{ //Enemy Class and Stats 
+class Enemy{ // Enemy Class and Stats 
     public:
     string name;
     int health;
@@ -27,25 +28,43 @@ class Enemy{ //Enemy Class and Stats
         
 };
 //Function Prototypes
-void GenerateRoom(Player& player_ob, mt19937& gen, uniform_int_distribution<int> dist); //Randomly chooses the next room on exploring
-void EnemySpawn(int id, Player& ply_ob); //Creates Enemy Object
-void Battle(Player& player_object, Enemy& enem_ob); //Controls Fight Sequences
+void GenerateRoom(Player& player_ob, mt19937& gen, uniform_int_distribution<int> dist); // Randomly chooses the next room on exploring
+void EnemySpawn(int id, Player& ply_ob); // Creates Enemy Object
+void Battle(Player& player_object, Enemy& enem_ob); // Controls Fight Sequences
+void SaveGame(Player& play_ob); // Saves Game on a txt file
+void LoadGame(Player& play_obj); // Loads Data from the Saved txt file
 
 int main(){ 
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> dist(1, 100);//Random number from 1-100 which decides our room
     Player player;
+    int mainmenuchoice;
     int choice;
     bool notQuit = true;
-    
     cout << "===============================\n"
          << "--------DUNGEON CRAWLER--------\n"
-         << "===============================\n";
+         << "===============================\n \n"
+         << "1. Continue Game\n" 
+         << "2. New Game\n"
+         << "3. Quit" << endl;
+    cin >> mainmenuchoice;
+    switch(mainmenuchoice){
+        case 1:
+            LoadGame(player);
+            break;
+        case 2:
+            remove("save.txt");
+            break;
+        case 3:
+            notQuit = false;
+            break;
+    }
+    
     while (notQuit){
-        if(player.health <0.1){
+        if(player.health <=0){
             int choiceafterdeath;
-            cout << "Play Again or Quit Game?\n"
+            cout << "\nPlay Again or Quit Game?\n"
                          << "1. PLAY AGAIN\n"
                          << "2. QUIT" << endl;
             cin >> choiceafterdeath;
@@ -68,7 +87,8 @@ int main(){
          << "1. Explore\n"
          << "2. Stats\n"
          << "3. Open Potion Bag\n"
-         << "4. Quit" << endl;
+         << "4. Save Game\n"
+         << "5. Quit" << endl;
         cin >> choice;
         switch(choice){
             case 1:
@@ -124,6 +144,9 @@ int main(){
                 cout << "\nYou close your Potion Bag" << endl;
                 break;
             case 4:
+                SaveGame(player);
+                break;
+            case 5:
                 notQuit = false;
                 break;
             default:
@@ -173,10 +196,12 @@ void Battle(Player& player_object, Enemy& enem_ob){
                 }
                 player_object.health -= enem_ob.attack; // Enemy deals damage to Player
                 cout << "The " << enem_ob.name << " attacks you for " << enem_ob.attack << "!" << endl;
-                if(player_object.health < 0.1){
+                if(player_object.health <= 0){
                     cout <<"+++===========================+++\n"
                          << "You Died to a " << enem_ob.name <<"\n"
-                         <<"+++===========================+++\n";
+                         <<"+++===========================+++\n"
+                         << "Final Score : " << player_object.score << endl;
+                    remove("save.txt");
                     is_fighting =false;
                     
                     
@@ -221,3 +246,29 @@ void GenerateRoom(Player& player_ob, mt19937& gen, uniform_int_distribution<int>
     }
 
 }
+
+void SaveGame(Player& play_ob){
+    ofstream savefile("save.txt");
+    savefile <<"Health = " << play_ob.health << "\n"
+             << "Attack = " << play_ob.attack << "\n"
+             << "Score = " << play_ob.score << "\n"
+             << "No_of_Health_Potions = " << play_ob.no_of_healthpotion << "\n"
+             << "No_of_Attack_Potions = " << play_ob.no_of_attackpotion << endl;
+    savefile.close();
+}
+void LoadGame(Player& play_obj){
+    ifstream loadfile("save.txt");
+    if(!loadfile){
+        cout << "No save file found. Starting a New Game" << endl;
+        return;
+    }
+    string label;
+    char equals;
+    loadfile >> label >> equals >> play_obj.health
+             >> label >> equals >> play_obj.attack
+             >> label >> equals >> play_obj.score
+             >> label >> equals >> play_obj.no_of_healthpotion
+             >> label >> equals >> play_obj.no_of_attackpotion;
+    loadfile.close();
+}
+
