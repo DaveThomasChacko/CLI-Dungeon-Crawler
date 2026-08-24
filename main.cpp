@@ -1,8 +1,6 @@
 #include <iostream>
 #include <random>
 using namespace std; 
-//Function Prototypes
-
 
 class Player{ // Player Class and Stats
     public:
@@ -28,11 +26,15 @@ class Enemy{ //Enemy Class and Stats
         }
         
 };
-void GenerateRoom(Player& player_ob); //Randomly chooses the next room on exploring
+//Function Prototypes
+void GenerateRoom(Player& player_ob, mt19937& gen, uniform_int_distribution<int> dist); //Randomly chooses the next room on exploring
 void EnemySpawn(int id, Player& ply_ob); //Creates Enemy Object
 void Battle(Player& player_object, Enemy& enem_ob); //Controls Fight Sequences
 
 int main(){ 
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dist(1, 100);//Random number from 1-100 which decides our room
     Player player;
     int choice;
     bool notQuit = true;
@@ -44,7 +46,7 @@ int main(){
         if(player.health <0.1){
             int choiceafterdeath;
             cout << "Play Again or Quit Game?\n"
-                         << "1. PLAY AGAIN"
+                         << "1. PLAY AGAIN\n"
                          << "2. QUIT" << endl;
             cin >> choiceafterdeath;
             switch (choiceafterdeath){
@@ -71,7 +73,7 @@ int main(){
         switch(choice){
             case 1:
                 cout << "\nYou entered a new room \n";
-                GenerateRoom(player);
+                GenerateRoom(player, gen, dist);
                 break;
             case 2:
                 cout << "\nPlayer Stats: \n"
@@ -200,10 +202,7 @@ void Battle(Player& player_object, Enemy& enem_ob){
     }
 }
 
-void GenerateRoom(Player& player_ob){
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<int> dist(1, 100);//Random number from 1-100 which decides our room
+void GenerateRoom(Player& player_ob, mt19937& gen, uniform_int_distribution<int> dist){
     int room_id = dist(gen);
     if (room_id <= 60) { 
         cout << "Enemy Spotted \n"; // 60% chance of an enemy room
