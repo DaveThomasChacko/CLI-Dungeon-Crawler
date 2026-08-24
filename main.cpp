@@ -21,7 +21,7 @@ class Enemy{ //Enemy Class and Stats
     int score_worth;
     Enemy(string name, int health, int attack, int score_worth)
         : name(name), health(health), attack(attack), score_worth(score_worth){
-            cout << name <<" : \n"
+            cout << "\n"<< name <<" : \n"
                  << "Health : " << health << "\n"
                  << "Attack : " << attack << endl;
 
@@ -36,11 +36,33 @@ int main(){
     Player player;
     int choice;
     bool notQuit = true;
+    
     cout << "===============================\n"
          << "--------DUNGEON CRAWLER--------\n"
          << "===============================\n";
     while (notQuit){
-        cout << "Choose your option\n"
+        if(player.health <0.1){
+            int choiceafterdeath;
+            cout << "Play Again or Quit Game?\n"
+                         << "1. PLAY AGAIN"
+                         << "2. QUIT" << endl;
+            cin >> choiceafterdeath;
+            switch (choiceafterdeath){
+                case 1:
+                    notQuit=true;
+                    player.health = 50;
+                    player.attack = 10;
+                    player.score = 0;
+                    player.no_of_attackpotion = 0;
+                    player.no_of_healthpotion = 0;
+                    break;
+                case 2:
+                    notQuit = false;
+                    break;
+            }
+        }
+        else{
+            cout << "\nChoose your option\n"
          << "1. Explore\n"
          << "2. Stats\n"
          << "3. Open Potion Bag\n"
@@ -48,55 +70,64 @@ int main(){
         cin >> choice;
         switch(choice){
             case 1:
-                cout << "You entered a new room \n";
+                cout << "\nYou entered a new room \n";
                 GenerateRoom(player);
                 break;
             case 2:
-                cout << "Player Stats: \n"
+                cout << "\nPlayer Stats: \n"
                  << "Health : " << player.health << "\n"
                  << "Attack Power : " << player.attack << "\n"
                  << "Score : " << player.score << "\n";
                 break;
             case 3:
                 int potionchoice;
-                cout << "Potion Bag :\n"
+                cout << "\nPotion Bag :\n"
                      << "\t Health Potions : " << player.no_of_healthpotion << "\n"
                      << "\t Attack Potions : " << player.no_of_attackpotion << "\n \n"
                      << "Use Potion?\n"
-                     << "1. Use Health Potion\n"
-                     << "2. Use Attack Potion\n"
-                     << "3. Close Potion Bag" << endl;
+                     << "\t1. Use Health Potion\n"
+                     << "\t2. Use Attack Potion\n"
+                     << "\t3. Close Potion Bag" << endl;
                 cin >> potionchoice;
                 switch (potionchoice){
                     case 1:
                         if(player.no_of_healthpotion > 0){
                             player.no_of_healthpotion -=1;
-                            player.health += 30;
-                            cout << "Your Health has increased by 30!" << endl;
+                            player.health += 20;
+                            cout << "\nYour Health has increased by 20!" << endl;
                             
+                        }
+                        else{
+                            cout << "\nYou don't have any Health Potions!"<<endl;
                         }
                         break;
                     case 2:
                         if(player.no_of_attackpotion > 0){
                             player.no_of_attackpotion -=1;
                             player.attack += 10;
-                            cout << "Your Attack Power has increased by 10!" << endl;
+                            cout << "\nYour Attack Power has increased by 10!" << endl;
                             
                         }
+                        else{
+                            cout << "\nYou don't have any Attack Potions!"<<endl;
+                        }
+
                         break;
                     case 3:
-                        cout << "You close your Potion Bag." << endl;
                         break;
                     default:
-                        cout << "Invalid Input!" << endl;
+                        cout << "\nInvalid Input!" << endl;
                         break;
                 }
+                cout << "\nYou close your Potion Bag" << endl;
                 break;
             case 4:
                 notQuit = false;
                 break;
             default:
                 cout << "Invalid Input\n";
+        }
+        
         }
     }
 }
@@ -121,7 +152,7 @@ void Battle(Player& player_object, Enemy& enem_ob){
     bool is_fighting = true;
     int battle_choice;
     while(is_fighting){
-        cout << "---FIGHT MENU---\n" 
+        cout << "\n---FIGHT MENU---\n" 
         << "1. Attack\n"  
         << "2. Player Stats\n" 
         << "3. Enemy Stats\n"
@@ -140,11 +171,13 @@ void Battle(Player& player_object, Enemy& enem_ob){
                 }
                 player_object.health -= enem_ob.attack; // Enemy deals damage to Player
                 cout << "The " << enem_ob.name << " attacks you for " << enem_ob.attack << "!" << endl;
-                if(player_object.health <= 0){
+                if(player_object.health < 0.1){
                     cout <<"+++===========================+++\n"
                          << "You Died to a " << enem_ob.name <<"\n"
                          <<"+++===========================+++\n";
                     is_fighting =false;
+                    
+                    
                 }
                 break;
             case 2:
